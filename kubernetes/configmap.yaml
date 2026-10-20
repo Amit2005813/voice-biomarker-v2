@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: voice-biomarker
+  labels:
+    app: voice-biomarker
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: voice-biomarker-config
+  namespace: voice-biomarker
+  labels:
+    app: voice-biomarker
+data:
+  APP_ENV: "production"
+  APP_HOST: "0.0.0.0"
+  APP_PORT: "8000"
+  APP_WORKERS: "4"
+  LOG_LEVEL: "info"
+  MODEL_PATH: "/app/models"
+  DATA_PATH: "/app/data"
+  UPLOAD_PATH: "/app/uploads"
+  MAX_UPLOAD_SIZE: "52428800"
+  CORS_ORIGINS: "*"
+  HEALTH_CHECK_INTERVAL: "30"
+  RATE_LIMIT_REQUESTS: "100"
+  RATE_LIMIT_WINDOW: "60"
+  CACHE_TTL: "3600"
+  MAX_CONCURRENT_ANALYSES: "10"
+  AUDIO_MAX_DURATION: "300"
+  AUDIO_SAMPLE_RATE: "22050"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: voice-biomarker-models-pvc
+  namespace: voice-biomarker
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: gp3
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: voice-biomarker-data-pvc
+  namespace: voice-biomarker
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: gp3
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: voice-biomarker-uploads-pvc
+  namespace: voice-biomarker
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: gp3
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: voice-biomarker-redis-pvc
+  namespace: voice-biomarker
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: gp3
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: voice-biomarker-sa
+  namespace: voice-biomarker
+  labels:
+    app: voice-biomarker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: voice-biomarker-role
+  namespace: voice-biomarker
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: voice-biomarker-rolebinding
+  namespace: voice-biomarker
+subjects:
+  - kind: ServiceAccount
+    name: voice-biomarker-sa
+    namespace: voice-biomarker
+roleRef:
+  kind: Role
+  name: voice-biomarker-role
+  apiGroup: rbac.authorization.k8s.io

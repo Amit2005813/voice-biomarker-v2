@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voice-biomarker-api
+  namespace: voice-biomarker
+  labels:
+    app: voice-biomarker
+    component: api
+    version: v2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: voice-biomarker
+      component: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: voice-biomarker
+        component: api
+        version: v2
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: voice-biomarker-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: api
+          image: IMAGE_PLACEHOLDER
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: voice-biomarker-config
+            - secretRef:
+                name: voice-biomarker-secrets
+          env:
+            - name: APP_ENV
+              value: "production"
+            - name: REDIS_URL
+              value: "redis://redis-service:6379/0"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+          volumeMounts:
+            - name: model-volume
+              mountPath: /app/models
+            - name: data-volume
+              mountPath: /app/data
+            - name: upload-volume
+              mountPath: /app/uploads
+            - name: tmp-volume
+              mountPath: /tmp
+      volumes:
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: voice-biomarker-models-pvc
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: voice-biomarker-data-pvc
+        - name: upload-volume
+          persistentVolumeClaim:
+            claimName: voice-biomarker-uploads-pvc
+        - name: tmp-volume
+          emptyDir:
+            sizeLimit: 500Mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - api
+                topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 60

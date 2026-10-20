@@ -1,0 +1,152 @@
+# ============================================================================
+# Voice Biomarker Platform v2 - Git Ignore
+# ============================================================================
+
+# ---------------------- Python ----------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.python-version
+
+# ---------------------- Data & Models --------------------------------------
+# Audio files (large binary files)
+uploads/
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.aac
+*.wma
+
+# Training data
+data/raw/
+data/processed/
+data/interim/
+data/external/
+
+# Model checkpoints and artifacts
+models/checkpoints/
+models/production/
+models/experiments/
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.pth
+*.pt
+*.onnx
+*.pb
+*.tflite
+*.pkl
+
+# MLflow artifacts
+mlruns/
+mlartifacts/
+
+# ---------------------- Environment -----------------------------------------
+.env
+.env.local
+.env.production
+.env.staging
+
+# ---------------------- IDE -------------------------------------------------
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (PyCharm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.#*
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# ---------------------- OS --------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# ---------------------- Testing & Coverage ----------------------------------
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+test-results.xml
+coverage.xml
+coverage.json
+junit/
+reports/
+
+# ---------------------- Logs ------------------------------------------------
+logs/
+*.log
+log/
+
+# ---------------------- Docker ----------------------------------------------
+docker-compose.override.yml
+
+# ---------------------- Kubernetes Secrets ----------------------------------
+# Never commit actual secrets
+kubernetes/secrets.yaml
+!kubernetes/secrets.yaml.example
+
+# ---------------------- Documentation Build ---------------------------------
+site/
+docs/_build/
+*.rst
+
+# ---------------------- Misc ------------------------------------------------
+*.bak
+*.tmp
+*.temp
+.cache/
+.mypy_cache/
+.ruff_cache/

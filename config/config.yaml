@@ -1,0 +1,44 @@
+# ── Voice Biomarker Platform v2 – Default Configuration ─────────────────────
+
+debug: false
+environment: development
+log_level: INFO
+
+audio:
+  target_sr: 16000
+  max_duration: 30
+  min_duration: 2
+  quality_threshold: 0.3
+
+model:
+  model_type: xgboost
+  num_features: 50
+  use_deep_model: false
+  checkpoint_dir: models/checkpoints
+
+training:
+  batch_size: 32
+  epochs: 100
+  learning_rate: 0.001
+  validation_split: 0.2
+  early_stopping_patience: 10
+
+api:
+  host: 0.0.0.0
+  port: 8000
+  max_upload_size: 52428800  # 50 MB in bytes
+  allowed_extensions:
+    - wav
+    - mp3
+    - ogg
+    - flac
+    - m4a
+
+explainability:
+  use_shap: true
+  use_lime: true
+  num_features: 10
+
+data:
+  synthetic_samples: 1000
+  data_dir: data
